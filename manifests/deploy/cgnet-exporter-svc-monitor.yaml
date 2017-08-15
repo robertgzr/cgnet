@@ -3,7 +3,6 @@ kind: ServiceMonitor
 metadata:
   name: cgnet-exporter
   labels:
-    app: cgnet-exporter
     k8s-app: cgnet-exporter
 spec:
   jobLabel: k8s-app
