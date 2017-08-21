@@ -17,15 +17,22 @@ limitations under the License.
 package kube
 
 import (
+	"fmt"
+
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
+	// "k8s.io/client-go/tools/clientcmd"
 )
 
 const DefaultCgroupRoot string = "/sys/fs/cgroup/systemd/kubepods"
 
 func BuildConfig(kubeconfig string) (*rest.Config, error) {
 	if kubeconfig != "" {
-		return clientcmd.BuildConfigFromFlags("", kubeconfig)
+		// TODO: doe it make sense to allow this?
+		// If host of the out-of-cluster cgnet process is a cluster-node we
+		// could install bpf programs there but not on other nodes
+		//
+		// return clientcmd.BuildConfigFromFlags("", kubeconfig)
+		return nil, fmt.Errorf("running out-of-cluster is not supported.")
 	}
 	return rest.InClusterConfig()
 }
