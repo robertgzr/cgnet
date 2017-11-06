@@ -18,6 +18,7 @@ package kube
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"k8s.io/apimachinery/pkg/fields"
@@ -26,6 +27,20 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 )
+
+var localHostname string
+
+func getHostname() string {
+	if localHostname == "" {
+		hn, err := os.Hostname()
+		if err != nil {
+			panic(err)
+		}
+		localHostname = hn
+	}
+	return localHostname
+
+}
 
 func WatchPodEvents(ctx context.Context, cancelFunc context.CancelFunc, cfg *rest.Config, events chan Event) {
 	_, err := watchCustomResources(ctx, cfg, events)

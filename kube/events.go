@@ -16,7 +16,11 @@ limitations under the License.
 
 package kube
 
-import "k8s.io/client-go/pkg/api/v1"
+import (
+	"log"
+
+	"k8s.io/client-go/pkg/api/v1"
+)
 
 type EventType int
 
@@ -39,7 +43,11 @@ func onAdd(events chan Event) func(obj interface{}) {
 		if !ok {
 			return
 		}
-		events <- Event{Type: NewPodEvent, PodUID: string(pod.UID), PodSelfLink: pod.SelfLink, PodQOSClass: string(pod.Status.QOSClass)}
+		log.Println("on host:", pod.Spec.Hostname)
+		if localHostname == pod.Spec.Hostname {
+			log.Println("running on same host", localHostname, "==", pod.Spec.Hostname)
+			events <- Event{Type: NewPodEvent, PodUID: string(pod.UID), PodSelfLink: pod.SelfLink, PodQOSClass: string(pod.Status.QOSClass)}
+		}
 		return
 	}
 }
@@ -65,7 +73,9 @@ func onDelete(events chan Event) func(obj interface{}) {
 		if !ok {
 			return
 		}
-		events <- Event{Type: DeletePodEvent, PodUID: string(pod.UID), PodSelfLink: pod.SelfLink, PodQOSClass: string(pod.Status.QOSClass)}
+		if localHostname == pod.Spec.Hostname {
+			events <- Event{Type: DeletePodEvent, PodUID: string(pod.UID), PodSelfLink: pod.SelfLink, PodQOSClass: string(pod.Status.QOSClass)}
+		}
 		return
 	}
 }

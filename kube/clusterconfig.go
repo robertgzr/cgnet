@@ -23,11 +23,11 @@ import (
 	// "k8s.io/client-go/tools/clientcmd"
 )
 
-const DefaultCgroupRoot string = "/sys/fs/cgroup/systemd/kubepods"
+const DefaultCgroupRoot string = "/sys/fs/cgroup/unified/cgnet"
 
 func BuildConfig(kubeconfig string) (*rest.Config, error) {
 	if kubeconfig != "" {
-		// TODO: doe it make sense to allow this?
+		// TODO: does it make sense to allow this?
 		// If host of the out-of-cluster cgnet process is a cluster-node we
 		// could install bpf programs there but not on other nodes
 		//
@@ -37,16 +37,6 @@ func BuildConfig(kubeconfig string) (*rest.Config, error) {
 	return rest.InClusterConfig()
 }
 
-// We are using the default root for now.
-// It looks like querying of the kubelet config is part of
-// this PR for dynamic kubelet configuration:
-//
-// https://github.com/kubernetes/features/issues/281
-// https://github.com/kubernetes/kubernetes/pull/46254
-//
-// TODO: investigate ^ or
-// https://github.com/kubernetes/community/blob/master/contributors/design-proposals/dynamic-kubelet-configuration.md#monitoring-configuration-status
-// there is some mention of the `configz` endpoint
 func GetCgroupRoot(_ *rest.Config) (string, error) {
 	return DefaultCgroupRoot, nil
 }
