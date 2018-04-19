@@ -1,41 +1,30 @@
-CONTAINER=10.0.0.240/cgnet-exporter
-MANIFEST_DIR=manifests/deploy
-MANIFEST=$(MANIFEST_DIR)/all-in-one.yaml
-BIN=cgnet
-GOOS=linux
-VERSION=$(shell git describe --tags --always --dirty)
+BIN_PATH := cgnet
+IMAGE := 10.0.0.240/cgnet-exporter
+TAG := $(shell git describe --tags --always)
 
-.PHONY: all clean build container manifest
+MANIFEST_DIR := manifests/deploy
+MANIFEST := $(MANIFEST_DIR)/all-in-one.yaml
 
-all: $(BIN)
+VERSION := $(shell git describe --tags --always --dirty)
 
-build: deps $(BIN)
-$(BIN): bpf/bindata.go
-	go build \
-	     -ldflags "-X github.com/kinvolk/cgnet/cmd.version=$(VERSION)" \
-	     -o $@ .
+build: bpf/bindata.go
+	go build -i -ldflags "-X github.com/kinvolk/cgnet/cmd.version=$(VERSION)" github.com/kinvolk/cgnet/cmd/cgnet
+
+linux: bpf/bindata.go
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-s" -o $(BIN_PATH) github.com/kinvolk/cgnet/cmd/cgnet 
 
 bpf/bindata.go:
 	@make -C bpf/
 
-container: $(BIN)
-	docker build -t $(CONTAINER):latest .
-	docker push $(CONTAINER):latest
+image: linux
+	docker build -t $(IMAGE):$(TAG) .
 
 manifest:
 	@make -C $(MANIFEST_DIR) clean
 	@make -C $(MANIFEST_DIR)
 
 clean:
-	rm -rf $(BIN)
+	rm -rf $(BIN_PATH)
 	@make -C bpf/ clean
 
-deploy-clean: clean
-	docker rmi $(CONTAINER):latest
-
-deps: build-deps
-	dep ensure -v
-
-build-deps:
-	go get -u github.com/golang/dep/...
-	go get -u github.com/jteeuwen/go-bindata/...
+.PHONY: clean build linux image manifest
