@@ -30,24 +30,17 @@ import (
 import "C"
 
 const (
-	packetsKey uint32 = 0
-	bytesKey   uint32 = 1
+	lookupInterval        = 1 * time.Second
+	packetsKey     uint32 = 0
+	bytesKey       uint32 = 1
 )
 
 type Controller struct {
 	cgroup string
 	module *bpf.Module
-	quit   chan struct{}
 
 	packetsHandler func(uint64) error
 	bytesHandler   func(uint64) error
-}
-
-func (c *Controller) Stop() {
-	c.quit <- struct{}{}
-	if err := c.module.Close(); err != nil {
-		log.Printf("error closing bpf module: %s", err)
-	}
 }
 
 func (c *Controller) SetPacketsHandler(h func(uint64) error) {
@@ -62,9 +55,7 @@ func (c *Controller) Run(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			return
-		case <-c.quit:
-			return
-		case <-time.After(1 * time.Second):
+		case <-time.After(lookupInterval):
 			// TODO this needs to be solved differently
 			// Maybe sending new values on individual channels?
 			packets, err := lookup(c.module, packetsKey)

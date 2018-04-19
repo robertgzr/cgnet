@@ -54,7 +54,6 @@ func Attach(cgroupPath string) (*Controller, error) {
 	ctl := &Controller{
 		cgroup: cgroupPath,
 		module: b,
-		quit:   make(chan struct{}),
 	}
 	return ctl, nil
 }

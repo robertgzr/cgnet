@@ -61,7 +61,6 @@ func cmdTop(cmd *cobra.Command, args []string) {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
 	go ctl.Run(ctx)
-	defer ctl.Stop()
 
 	term := make(chan os.Signal)
 	signal.Notify(term, syscall.SIGINT, syscall.SIGTERM)
@@ -69,6 +68,10 @@ func cmdTop(cmd *cobra.Command, args []string) {
 	for {
 		select {
 		case <-term:
+			fmt.Fprintln(os.Stdout, "SIGTERM received, shutting down gracefully...")
+			return
+		case <-ctx.Done():
+			fmt.Fprintln(os.Stdout, "Controller stopped")
 			return
 		case <-time.After(1 * time.Second):
 			fmt.Fprintf(os.Stdout, "\rcgroup received %d packets (%d bytes)", packets, bytes)

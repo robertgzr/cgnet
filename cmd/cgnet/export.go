@@ -71,12 +71,14 @@ func cmdExport(cmd *cobra.Command, args []string) {
 	term := make(chan os.Signal)
 	signal.Notify(term, syscall.SIGINT, syscall.SIGTERM)
 
-	var ctlMap map[string]*bpf.Controller
+	var cancelMap map[string]context.CancelFunc
 	for {
 		select {
 		case <-term:
+			fmt.Fprintln(os.Stdout, "SIGTERM received, shutting down gracefully...")
 			return
 		case <-ctx.Done():
+			fmt.Fprintln(os.Stdout, "Controller stopped")
 			return
 		case e := <-events:
 			switch e.Type {
@@ -94,14 +96,14 @@ func cmdExport(cmd *cobra.Command, args []string) {
 					metrics.SetOutgoingPackets(path.Base(e.PodSelfLink), float64(v))
 					return nil
 				})
+				ctx, cancelMap[e.PodUID] = context.WithCancel(ctx)
 				go bpfController.Run(ctx)
-				ctlMap[e.PodUID] = bpfController
 
 			case kube.DeletePodEvent:
 				metrics.TotalNum().Sub(1)
 				log.Debug("pod gone", "pod", e.PodSelfLink, "cgroup", buildCgroupPath(cgroupRoot, e.PodUID, e.PodQOSClass))
 				metrics.TotalNum().Sub(1)
-				ctlMap[e.PodUID].Stop()
+				cancelMap[e.PodUID]()
 			}
 		}
 	}
