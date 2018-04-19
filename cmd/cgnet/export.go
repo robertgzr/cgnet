@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package cgnet
 
 import (
 	"context"
@@ -34,8 +34,8 @@ import (
 )
 
 var (
-	metricsPort      int
-	kubeconfig       string
+	metricsPort int
+	kubeconfig  string
 )
 
 var exportCmd = &cobra.Command{
@@ -112,7 +112,7 @@ func buildCgroupPath(root, uid, qosclass string) string {
 }
 
 func init() {
-	RootCmd.AddCommand(exportCmd)
+	rootCmd.AddCommand(exportCmd)
 
 	exportCmd.Flags().IntVarP(&metricsPort, "port", "p", 9101, "metrics port")
 	exportCmd.Flags().StringVarP(&kubeconfig, "kubeconfig", "k", "", "path to kubeconfig file. Only required if out-of-cluster.")
