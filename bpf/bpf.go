@@ -22,6 +22,7 @@ import (
 	"os"
 	"unsafe"
 
+	"github.com/gobuffalo/packr"
 	bpf "github.com/iovisor/gobpf/elf"
 )
 
@@ -65,7 +66,7 @@ func initModule() (*bpf.Module, error) {
 		b = bpf.NewModule(path)
 	} else {
 		// from assets
-		reader := bytes.NewReader(MustAsset(assetPath))
+		reader := bytes.NewReader(packr.NewBox("out/").Bytes(assetPath))
 		b = bpf.NewModuleFromReader(reader)
 	}
 	if b == nil {

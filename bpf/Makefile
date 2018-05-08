@@ -13,9 +13,10 @@ $(OUTFILE):
 			-O2 -emit-llvm -c "src/cgnet.c" \
 			-o - | llc -march=bpf -filetype=obj -o $(OUTFILE)
 
-bindata.go:
-	go-bindata -pkg bpf out/
+gen: bpf-packr.go
+bpf-packr.go:
+	packr
 
 clean:
-	rm -rf bindata.go
+	packr clean
 	rm -rf $(OUTFILE)

@@ -1,5 +1,5 @@
 ./cgnet
 .vagrant/
 vendor/
-bpf/bindata.go
+bpf/*-packr.go
 bpf/out/

@@ -6,14 +6,15 @@ MANIFEST_DIR := manifests/deploy
 MANIFEST := $(MANIFEST_DIR)/all-in-one.yaml
 
 VERSION := $(shell git describe --tags --always --dirty)
+BINDATA := bpf/bpf-packr.go
 
-build: bpf/bindata.go
+build: $(BINDATA)
 	go build -i -ldflags "-X github.com/kinvolk/cgnet/cmd.version=$(VERSION)" github.com/kinvolk/cgnet/cmd/cgnet
 
-linux: bpf/bindata.go
+linux: $(BINDATA)
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-s" -o $(BIN_PATH) github.com/kinvolk/cgnet/cmd/cgnet 
 
-bpf/bindata.go:
+$(BINDATA):
 	@make -C bpf/
 
 image: linux
