@@ -38,6 +38,38 @@ cgroups](https://github.com/torvalds/linux/commit/ca89fa77b4488ecf2e3f72096386e8
 * Linux v4.10-rc
 * `CONFIG_CGROUP_BPF=y`
 
+## Development
+
+If the development machine complies with the dependencies above:
+
+```shell
+$ dep ensure
+$ make build
+```
+
+To use the provided Vagrantfile:
+
+```shell
+$ dep ensure
+$ vagrant up && vagrant ssh
+
+# now inside vm
+$ cd go/src/github.com/kinvolk/cgnet
+$ make build
+```
+
+Test run on minikube:
+
+```shell
+minikube addons enable registry
+minikube start
+eval $(minikube docker-env)
+
+make clean manifest image
+
+kubectl apply -f manifests/example/*.yaml
+```
+
 ## Vendoring
 
 We use [dep](https://github.com/golang/dep).
