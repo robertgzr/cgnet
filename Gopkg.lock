@@ -14,6 +14,12 @@
   revision = "de5bf2ad457846296e2031421a34e2568e304e35"
 
 [[projects]]
+  name = "github.com/VividCortex/gohistogram"
+  packages = ["."]
+  revision = "51564d9861991fb0ad0f531c99ef602d0f9866e6"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
@@ -44,7 +50,11 @@
   name = "github.com/go-kit/kit"
   packages = [
     "log",
-    "log/level"
+    "log/level",
+    "log/term",
+    "metrics",
+    "metrics/generic",
+    "metrics/internal/lv"
   ]
   revision = "ca4112baa34cb55091301bdc13b1420a122b1b9e"
   version = "v0.7.0"
@@ -249,6 +259,12 @@
   packages = ["."]
   revision = "1df9eeb2bb81f327b96228865c5687bc2194af3f"
   version = "1.0.0"
+
+[[projects]]
+  name = "github.com/ogier/pflag"
+  packages = ["."]
+  revision = "32a05c62658bd1d7c7e75cbc8195de5d585fde0f"
+  version = "v0.0.1"
 
 [[projects]]
   branch = "master"
@@ -524,6 +540,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1a0ff59dc3332b80436fdb5ee47c55dec32652eae5498ff237e95d9000889296"
+  inputs-digest = "c0401b4cc1f90a4b40886df5122e3560af24e5459a9e99a1fb357458f9ee6aa3"
   solver-name = "gps-cdcl"
   solver-version = 1
